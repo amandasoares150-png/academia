@@ -51,3 +51,18 @@ insert into alunos (nome, email, cpf, telefone) values
 ('Felipe Couto', 'felipe_cout0@gmail.com', '23756907364', '(48)6742-8756'),
 ('Selma Soares', 'selmasoares3@gmail.com', '72890254683', '(48)9735-1254')
 
+insert into planos (nome_plano,valor_mensal_base) values
+('musculação e fit dance', 319.99),
+('musculação', 260.00),
+('crossfit', 240.00)
+
+insert into modalidades (plano_id, nome_aula, sala, capacidade_maxima, disponivel) values
+(2, 'musculação', 'sala 2', 60, true),
+(1, 'fit dance', 'sala 5', 25, true),
+(3, 'crossfit', 'sala 3', 15, true)
+
+insert into matriculas (aluno_id, status) values
+(1, 'ativo'),
+(2, 'trancada'),
+(2, 'ativo'),
+(3, 'ativo')
