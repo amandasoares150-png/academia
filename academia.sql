@@ -66,3 +66,83 @@ insert into matriculas (aluno_id, status) values
 (2, 'trancada'),
 (2, 'ativo'),
 (3, 'ativo')
+
+insert into itens_matriculas (matricula_id, modalidade_id, duracao_meses, valor_mensal_aplicado, taxa_adesao) values
+(2, 1, 12, 319.99, 30.00),
+(3, 2, 6, 260.00, 50.00),
+(3, 2, 12, 260.00, 50.00),
+(4, 3, 12, 240.00, 30.00)
+
+create view vw_modalidades_custo_estimado as
+select
+    m.nome_aula as modalidade,
+    m.sala,
+    p.nome_plano,
+    p.valor_mensal_base * 1.10 as valor_mensal_ajustado
+from modalidades m
+join planos p on m.plano_id = p.id
+order by valor_mensal_ajustado desc;
+
+create view vw_matriculas_ativas as
+select
+    a.nome,
+    a.cpf,
+    mo.nome_aula as modalidade,
+    mo.sala,
+    i.duracao_meses,
+    ma.data_inicio
+from alunos a
+join matriculas ma on a.id = ma.aluno_id
+join itens_matriculas i on ma.id = i.matricula_id
+join modalidades mo on i.modalidade_id = mo.id
+where ma.status = 'ativo';
+
+create view vw_alunos_vip as
+select
+    a.nome,
+    count(distinct ma.id) as quantidade_contratos_ativos,
+    sum((i.valor_mensal_aplicado * i.duracao_meses) + i.taxa_adesao) as valor_total_investido
+from alunos a
+join matriculas ma on a.id = ma.aluno_id
+join itens_matriculas i on ma.id = i.matricula_id
+where ma.status = 'ativo'
+group by a.id, a.nome
+having sum((i.valor_mensal_aplicado * i.duracao_meses) + i.taxa_adesao) > 1000;
+
+select
+    m.nome_aula as modalidade,
+    m.sala,
+    m.capacidade_maxima,
+    p.nome_plano,
+    p.valor_mensal_base,
+    m.disponivel
+from modalidades m
+join planos p on m.plano_id = p.id
+where m.capacidade_maxima >= 15
+and p.valor_mensal_base > 100
+and m.disponivel = true;
+
+create view vw_faturamento_medio_plano as
+select
+    p.nome_plano,
+    sum((i.valor_mensal_aplicado * i.duracao_meses) + i.taxa_adesao) as faturamento_total_acumulado,
+    avg(i.duracao_meses) as media_duracao_contratos
+from planos p
+join modalidades mo on p.id = mo.plano_id
+join itens_matriculas i on mo.id = i.modalidade_id
+join matriculas ma on i.matricula_id = ma.id
+where ma.status = 'ativo'
+group by p.id, p.nome_plano;
+
+select
+    m.nome_aula as modalidade,
+    m.sala,
+    m.capacidade_maxima,
+    p.nome_plano,
+    p.valor_mensal_base,
+    m.disponivel
+from modalidades m
+join planos p on m.plano_id = p.id
+where m.capacidade_maxima >= 15
+and p.valor_mensal_base > 100
+and m.disponivel = true;
